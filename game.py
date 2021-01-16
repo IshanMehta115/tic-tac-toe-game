@@ -32,6 +32,11 @@ game_grid = []
 turn = 'player'
 time=0
 
+number=0
+dir=''
+won=False
+strike_fraction = 0
+
 screen_selected='main menu'
 
 class button:
@@ -93,14 +98,17 @@ def check_position(r,c):
             return False
     return True
 def strike(a,b):
+    global strike_fraction
     if(b=='row'):
-        pygame.draw.line(window,(255,255,255),(unitLength+unitLength/5,a*unitLength+unitLength/2),(3*unitLength+unitLength-unitLength/5,a*unitLength+unitLength/2),strike_width)
+        pygame.draw.line(window,(255,255,255),(unitLength+unitLength/5,a*unitLength+unitLength/2),(unitLength+unitLength/5+strike_fraction*(3*unitLength-2*unitLength/5),(a*unitLength+unitLength/2)),strike_width)
     if(b=='col'):
-        pygame.draw.line(window,(255,255,255),(a*unitLength+unitLength/2,unitLength+unitLength/5),(a*unitLength+unitLength/2,3*unitLength+unitLength-unitLength/5),strike_width)
+        pygame.draw.line(window,(255,255,255),(a*unitLength+unitLength/2,unitLength+unitLength/5),(a*unitLength+unitLength/2,unitLength+unitLength/5+strike_fraction*(3*unitLength-2*unitLength/5)),strike_width)
     if(b=='dia' and a==1):
-        pygame.draw.line(window,(255,255,255),(unitLength+unitLength/5,unitLength+unitLength/5),(3*unitLength+unitLength-unitLength/5,3*unitLength+unitLength-unitLength/5),strike_width)
+        pygame.draw.line(window,(255,255,255),(unitLength+unitLength/5,unitLength+unitLength/5),(unitLength+unitLength/5+strike_fraction*(3*unitLength-2*unitLength/5),unitLength+unitLength/5+strike_fraction*(3*unitLength-2*unitLength/5),strike_width))
     if(b=='dia' and a==2):
-         pygame.draw.line(window,(255,255,255),(unitLength+unitLength/5,3*unitLength+unitLength-unitLength/5),(3*unitLength+unitLength-unitLength/5,unitLength+unitLength/5),strike_width)
+         pygame.draw.line(window,(255,255,255),(unitLength+unitLength/5,3*unitLength+unitLength-unitLength/5),(unitLength+unitLength/5+strike_fraction*(3*unitLength-2*unitLength/5),3*unitLength+unitLength-unitLength/5-strike_fraction*(3*unitLength-2*unitLength/5)),strike_width)
+
+    strike_fraction+=0.0625
 
 
 def check_win():
@@ -114,8 +122,7 @@ def check_win():
                 elif g[2]=='O':
                     this_row_computer+=1
         if this_row_player==3 or this_row_computer==3:
-            strike(i,'col')
-            return True
+            return i,'col',True
     
     for j in range(1,4):
         this_col_player = 0
@@ -127,8 +134,7 @@ def check_win():
                 elif g[2]=='O':
                     this_col_computer+=1
         if this_col_computer==3 or this_col_player==3:
-            strike(j,'row')
-            return True
+            return j,'row',True
     
     temp_player = 0
     temp_computer = 0
@@ -139,8 +145,7 @@ def check_win():
             elif g[2]=='O':
                 temp_computer+=1
     if temp_player==3 or temp_computer==3:
-        strike(1,'dia')
-        return True
+        return 1,'dia',True
 
     temp_player = 0
     temp_computer = 0
@@ -151,17 +156,17 @@ def check_win():
             elif g[2]=='O':
                 temp_computer+=1
     if temp_player==3 or temp_computer==3:
-        strike(2,'dia')
-        return True
-    return False
+        return 2,'dia',True
+    return 0,'',False
         
 
 def main_loop():
     run = True
     game_ready=False
-    global turn,time
+    global turn,time,screen_selected,number,dir,won
     while(run):
-        time = max(-1,time-1)
+        pygame.time.delay(50)
+        time = max(-1,time-100)
         for events in pygame.event.get():
             if(events.type==pygame.QUIT):
                 run=False
@@ -203,10 +208,10 @@ def main_loop():
                     text = game_name_font.render(i[2],True,pygame.Color('DarkBlue'))
                     window.blit(text,(unitLength*i[0]+unitLength/2-text.get_width()/2,unitLength*i[1]+unitLength/2-text.get_height()/2))
                 pygame.display.update()
-                if(check_win()):
-                    run=False
-                    pygame.display.update()
-                    pygame.time.delay(2000)
+                number,dir,won = check_win()
+                if(won):
+                    screen_selected='won'
+                    pygame.time.delay(500)
             else:
                 mouseBtn1,mouseBtn2,mouseBtn3 = pygame.mouse.get_pressed()
                 if(not mouseBtn1):
@@ -217,6 +222,21 @@ def main_loop():
             window.blit(bg_img,(0,0))
             show_main_menu()
             pygame.display.update()
+        elif(screen_selected=='won'):
+            print("won section")
+            window.blit(bg_img,(0,0))
+            pygame.draw.line(window,(0,0,0),(2*unitLength,unitLength),(2*unitLength,screenHeight-unitLength),line_width)
+            pygame.draw.line(window,(0,0,0),(3*unitLength,unitLength),(3*unitLength,screenHeight-unitLength),line_width)
+            pygame.draw.line(window,(0,0,0),(unitLength,2*unitLength),(screenWidth-unitLength,2*unitLength),line_width)
+            pygame.draw.line(window,(0,0,0),(unitLength,3*unitLength),(screenWidth-unitLength,3*unitLength),line_width)
+            for i in game_grid:
+                    text = game_name_font.render(i[2],True,pygame.Color('DarkBlue'))
+                    window.blit(text,(unitLength*i[0]+unitLength/2-text.get_width()/2,unitLength*i[1]+unitLength/2-text.get_height()/2))
+            strike(number,dir)
+            pygame.display.update()
+            if(strike_fraction>1):
+                pygame.time.delay(1000)
+                run=False
+
 set_main_menu()
 main_loop()
-
