@@ -5,6 +5,8 @@ pygame.init()
 screenWidth=500
 screenHeight=500
 unitLength = 500/5
+strike_width=6
+line_width=6
 window = pygame.display.set_mode((screenWidth,screenHeight))
 pygame.display.set_caption("Tic-Tac-Toe")
 
@@ -61,15 +63,6 @@ def set_main_menu():
     for i in range(button_number):
         buttons[i].set_rect(pygame.Rect(screenWidth/2-buttonWidth/2,200+i*buttonGap,buttonWidth,buttonHeight))
 
-    # for i in buttons:
-    #     pygame.draw.rect(window,pygame.Color('Red'),i)
-
-
-    
-    # window.blit(play_game_text,(buttons[0].x+buttons[0].width/2 - play_game_text.get_width()/2,buttons[0].y+buttons[0].height/2 - play_game_text.get_height()/2))
-    # window.blit(exit_game_text,(buttons[1].x+buttons[1].width/2 - play_game_text.get_width()/2,buttons[1].y+buttons[1].height/2 - play_game_text.get_height()/2))
-
-
         
 def check_hovering():
     mouseX,mouseY = pygame.mouse.get_pos()
@@ -101,13 +94,13 @@ def check_position(r,c):
     return True
 def strike(a,b):
     if(b=='row'):
-        pygame.draw.line(window,(255,255,255),(unitLength+unitLength/2,a*unitLength+unitLength/2),(3*unitLength+unitLength/2,a*unitLength+unitLength/2),4)
+        pygame.draw.line(window,(255,255,255),(unitLength+unitLength/5,a*unitLength+unitLength/2),(3*unitLength+unitLength-unitLength/5,a*unitLength+unitLength/2),strike_width)
     if(b=='col'):
-        pygame.draw.line(window,(255,255,255),(a*unitLength+unitLength/2,unitLength+unitLength/2),(a*unitLength+unitLength/2,3*unitLength+unitLength/2),4)
+        pygame.draw.line(window,(255,255,255),(a*unitLength+unitLength/2,unitLength+unitLength/5),(a*unitLength+unitLength/2,3*unitLength+unitLength-unitLength/5),strike_width)
     if(b=='dia' and a==1):
-        pygame.draw.line(window,(255,255,255),(unitLength+unitLength/2,unitLength+unitLength/2),(3*unitLength+unitLength/2,3*unitLength+unitLength/2),4)
+        pygame.draw.line(window,(255,255,255),(unitLength+unitLength/5,unitLength+unitLength/5),(3*unitLength+unitLength-unitLength/5,3*unitLength+unitLength-unitLength/5),strike_width)
     if(b=='dia' and a==2):
-         pygame.draw.line(window,(255,255,255),(unitLength+unitLength/2,3*unitLength+unitLength/2),(3*unitLength+unitLength/2,unitLength+unitLength/2),4)
+         pygame.draw.line(window,(255,255,255),(unitLength+unitLength/5,3*unitLength+unitLength-unitLength/5),(3*unitLength+unitLength-unitLength/5,unitLength+unitLength/5),strike_width)
 
 
 def check_win():
@@ -177,10 +170,10 @@ def main_loop():
         elif(screen_selected=='Play Game'):
             if game_ready:
                 window.blit(bg_img,(0,0))
-                pygame.draw.line(window,(0,0,0),(2*unitLength,unitLength),(2*unitLength,screenHeight-unitLength),1)
-                pygame.draw.line(window,(0,0,0),(3*unitLength,unitLength),(3*unitLength,screenHeight-unitLength),1)
-                pygame.draw.line(window,(0,0,0),(unitLength,2*unitLength),(screenWidth-unitLength,2*unitLength),1)
-                pygame.draw.line(window,(0,0,0),(unitLength,3*unitLength),(screenWidth-unitLength,3*unitLength),1)
+                pygame.draw.line(window,(0,0,0),(2*unitLength,unitLength),(2*unitLength,screenHeight-unitLength),line_width)
+                pygame.draw.line(window,(0,0,0),(3*unitLength,unitLength),(3*unitLength,screenHeight-unitLength),line_width)
+                pygame.draw.line(window,(0,0,0),(unitLength,2*unitLength),(screenWidth-unitLength,2*unitLength),line_width)
+                pygame.draw.line(window,(0,0,0),(unitLength,3*unitLength),(screenWidth-unitLength,3*unitLength),line_width)
 
                 mousex,mousey = pygame.mouse.get_pos()
                 mousex = mousex//unitLength
@@ -196,7 +189,8 @@ def main_loop():
                                 turn='computer'
                                 time = 1000
                             else:
-                                pygame.draw.rect(window,(179, 179, 255),(unitLength*mousex,unitLength*mousey,unitLength,unitLength))
+                                gap = 10
+                                pygame.draw.rect(window,(179, 179, 255),(unitLength*mousex+gap,unitLength*mousey+gap,unitLength-2*gap,unitLength-2*gap))
                 elif(turn=='computer' and len(game_grid)<9 and time<0):
                     mousex=random.randint(1,3)
                     mousey=random.randint(1,3)
