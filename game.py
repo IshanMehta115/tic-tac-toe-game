@@ -19,10 +19,14 @@ marker_font = pygame.font.SysFont('comicsans',30,True,False)
 
 game_name = "Tic-Tac-Toe"
 game_name_text = ''
+options_text = ''
 play_game = "Play Game"
 exit_game = "Exit Game"
+restart_game = "Restart Game"
+back_to_main_menu = "Back to Main Menu"
 
 buttons = []
+optionButtons = []
 button_number = 2
 buttonWidth=200
 buttonHeight=50
@@ -37,7 +41,22 @@ dir=''
 won=False
 strike_fraction = 0
 
+new_screen_ready=False
 screen_selected='main menu'
+
+
+def restart_values():
+    global game_grid,turn,time,number,dir,won,strike_fraction,new_screen_ready
+    game_grid = []
+    if(random.randint(1,2)==1):
+        turn='player'
+    else:
+        turn='computer'
+    number=0
+    dir=''
+    won=False
+    strike_fraction=0
+    new_screen_ready=False
 
 class button:
     def __init__(self,text,normal_text_color,glow_text_color,text_font,mode):
@@ -59,8 +78,9 @@ class button:
         self.mode = new_mode
 
 def set_main_menu():
-    global game_name_text
+    global game_name_text,options_text
     game_name_text = game_name_font.render(game_name,True,pygame.Color('DarkBlue'))
+    options_text = game_name_font.render("Options",True,pygame.Color('DarkBlue'))
     
 
     buttons.append(button(play_game,'DarkBlue','White',button_font,'normal'))
@@ -68,29 +88,59 @@ def set_main_menu():
     for i in range(button_number):
         buttons[i].set_rect(pygame.Rect(screenWidth/2-buttonWidth/2,200+i*buttonGap,buttonWidth,buttonHeight))
 
+
+    optionButtons.append(button(restart_game,'DarkBlue','White',button_font,'normal'))
+    optionButtons.append(button(back_to_main_menu,'DarkBlue','White',button_font,'normal'))
+    for i in range(2):
+        optionButtons[i].set_rect(pygame.Rect(screenWidth/2-buttonWidth/2,200+i*buttonGap,buttonWidth,buttonHeight))
+         
+
         
 def check_hovering():
     mouseX,mouseY = pygame.mouse.get_pos()
-    for i in buttons:
-        if (i.rect.x <= mouseX <= i.rect.x+i.rect.width) and (i.rect.y <= mouseY <= i.rect.y+i.rect.height):
-            i.set_mode('glow')
-        else:
-            i.set_mode('normal')
+    if(screen_selected=='main menu'):
+        for i in buttons:
+            if (i.rect.x <= mouseX <= i.rect.x+i.rect.width) and (i.rect.y <= mouseY <= i.rect.y+i.rect.height):
+                i.set_mode('glow')
+            else:
+                i.set_mode('normal')
+    elif screen_selected=='options':
+        for i in optionButtons:
+            if (i.rect.x <= mouseX <= i.rect.x+i.rect.width) and (i.rect.y <= mouseY <= i.rect.y+i.rect.height):
+                i.set_mode('glow')
+            else:
+                i.set_mode('normal')
 
 def show_main_menu():
     window.blit(game_name_text,(screenWidth/2-game_name_text.get_width()/2,30))
     for i in range(button_number):
         buttons[i].display()
 
+def show_options():
+    window.blit(options_text,(screenWidth/2-options_text.get_width()/2,30))
+    for i in range(2):
+        optionButtons[i].display()
+
 def check_click():
-    global screen_selected
-    mouse_button1, mouse_button2, mouse_button3 = pygame.mouse.get_pressed(3)
+    global screen_selected,new_screen_ready
+    mouse_button1, mouse_button2, mouse_button3 = pygame.mouse.get_pressed()
     mouseX,mouseY = pygame.mouse.get_pos()
     if(not mouse_button1):
         return
-    for i in buttons:
-        if (i.rect.x <= mouseX <= i.rect.x+i.rect.width) and (i.rect.y <= mouseY <= i.rect.y+i.rect.height):
-            screen_selected=i.text
+    if(screen_selected=='main menu'):
+        for i in buttons:
+            if (i.rect.x <= mouseX <= i.rect.x+i.rect.width) and (i.rect.y <= mouseY <= i.rect.y+i.rect.height):
+                screen_selected=i.text
+                new_screen_ready=False
+    elif(screen_selected=='options'):
+        for i in optionButtons:
+            if (i.rect.x <= mouseX <= i.rect.x+i.rect.width) and (i.rect.y <= mouseY <= i.rect.y+i.rect.height):
+                if(i.text=='Restart Game'):
+                    restart_values()
+                    screen_selected='Play Game'
+                elif(i.text=='Back to Main Menu'):
+                    restart_values()
+                    screen_selected='main menu'
 
 def check_position(r,c):
     for i in game_grid:
@@ -104,7 +154,7 @@ def strike(a,b):
     if(b=='col'):
         pygame.draw.line(window,(255,255,255),(a*unitLength+unitLength/2,unitLength+unitLength/5),(a*unitLength+unitLength/2,unitLength+unitLength/5+strike_fraction*(3*unitLength-2*unitLength/5)),strike_width)
     if(b=='dia' and a==1):
-        pygame.draw.line(window,(255,255,255),(unitLength+unitLength/5,unitLength+unitLength/5),(unitLength+unitLength/5+strike_fraction*(3*unitLength-2*unitLength/5),unitLength+unitLength/5+strike_fraction*(3*unitLength-2*unitLength/5),strike_width))
+        pygame.draw.line(window,(255,255,255),(unitLength+unitLength/5,unitLength+unitLength/5),(unitLength+unitLength/5+strike_fraction*(3*unitLength-2*unitLength/5),unitLength+unitLength/5+strike_fraction*(3*unitLength-2*unitLength/5)),strike_width)
     if(b=='dia' and a==2):
          pygame.draw.line(window,(255,255,255),(unitLength+unitLength/5,3*unitLength+unitLength-unitLength/5),(unitLength+unitLength/5+strike_fraction*(3*unitLength-2*unitLength/5),3*unitLength+unitLength-unitLength/5-strike_fraction*(3*unitLength-2*unitLength/5)),strike_width)
 
@@ -162,8 +212,7 @@ def check_win():
 
 def main_loop():
     run = True
-    game_ready=False
-    global turn,time,screen_selected,number,dir,won
+    global turn,time,screen_selected,number,dir,won,new_screen_ready
     while(run):
         pygame.time.delay(50)
         time = max(-1,time-100)
@@ -173,57 +222,66 @@ def main_loop():
         if(screen_selected=='Exit Game'):
             run = False
         elif(screen_selected=='Play Game'):
-            if game_ready:
-                window.blit(bg_img,(0,0))
-                pygame.draw.line(window,(0,0,0),(2*unitLength,unitLength),(2*unitLength,screenHeight-unitLength),line_width)
-                pygame.draw.line(window,(0,0,0),(3*unitLength,unitLength),(3*unitLength,screenHeight-unitLength),line_width)
-                pygame.draw.line(window,(0,0,0),(unitLength,2*unitLength),(screenWidth-unitLength,2*unitLength),line_width)
-                pygame.draw.line(window,(0,0,0),(unitLength,3*unitLength),(screenWidth-unitLength,3*unitLength),line_width)
+            if len(game_grid)==9:
+                pygame.time.delay(1000)
+                restart_values()
+                screen_selected='main menu'
+            else:
+                if new_screen_ready:
+                    window.blit(bg_img,(0,0))
+                    pygame.draw.line(window,(0,0,0),(2*unitLength,unitLength),(2*unitLength,screenHeight-unitLength),line_width)
+                    pygame.draw.line(window,(0,0,0),(3*unitLength,unitLength),(3*unitLength,screenHeight-unitLength),line_width)
+                    pygame.draw.line(window,(0,0,0),(unitLength,2*unitLength),(screenWidth-unitLength,2*unitLength),line_width)
+                    pygame.draw.line(window,(0,0,0),(unitLength,3*unitLength),(screenWidth-unitLength,3*unitLength),line_width)
 
-                mousex,mousey = pygame.mouse.get_pos()
-                mousex = mousex//unitLength
-                mousey = mousey//unitLength
+                    mousex,mousey = pygame.mouse.get_pos()
+                    mousex = mousex//unitLength
+                    mousey = mousey//unitLength
 
-                mouseBtn1,mouseBtn2,mouseBtn3 = pygame.mouse.get_pressed()
+                    mouseBtn1,mouseBtn2,mouseBtn3 = pygame.mouse.get_pressed()
 
-                if(turn=='player'):
-                    if(1<=mousex<=3 and 1<=mousey<=3):
-                        if(check_position(mousex,mousey)):
-                            if(mouseBtn1):
-                                game_grid.append((mousex,mousey,'X'))
-                                turn='computer'
-                                time = 1000
-                            else:
-                                gap = 10
-                                pygame.draw.rect(window,(179, 179, 255),(unitLength*mousex+gap,unitLength*mousey+gap,unitLength-2*gap,unitLength-2*gap))
-                elif(turn=='computer' and len(game_grid)<9 and time<0):
-                    mousex=random.randint(1,3)
-                    mousey=random.randint(1,3)
-                    while(not check_position(mousex,mousey)):
+                    if(turn=='player'):
+                        if(1<=mousex<=3 and 1<=mousey<=3):
+                            if(check_position(mousex,mousey)):
+                                if(mouseBtn1):
+                                    game_grid.append((mousex,mousey,'X'))
+                                    turn='computer'
+                                    time = 1000
+                                else:
+                                    gap = 10
+                                    pygame.draw.rect(window,(179, 179, 255),(unitLength*mousex+gap,unitLength*mousey+gap,unitLength-2*gap,unitLength-2*gap))
+                    elif(turn=='computer' and len(game_grid)<9 and time<0):
                         mousex=random.randint(1,3)
                         mousey=random.randint(1,3)
-                    game_grid.append((mousex,mousey,'O'))
-                    turn='player'
-                for i in game_grid:
-                    text = game_name_font.render(i[2],True,pygame.Color('DarkBlue'))
-                    window.blit(text,(unitLength*i[0]+unitLength/2-text.get_width()/2,unitLength*i[1]+unitLength/2-text.get_height()/2))
-                pygame.display.update()
-                number,dir,won = check_win()
-                if(won):
-                    screen_selected='won'
-                    pygame.time.delay(500)
+                        while(not check_position(mousex,mousey)):
+                            mousex=random.randint(1,3)
+                            mousey=random.randint(1,3)
+                        game_grid.append((mousex,mousey,'O'))
+                        turn='player'
+                    for i in game_grid:
+                        text = game_name_font.render(i[2],True,pygame.Color('DarkBlue'))
+                        window.blit(text,(unitLength*i[0]+unitLength/2-text.get_width()/2,unitLength*i[1]+unitLength/2-text.get_height()/2))
+                    pygame.display.update()
+                    number,dir,won = check_win()
+                    if(won):
+                        screen_selected='won'
+                        pygame.time.delay(500)
+                else:
+                    mouseBtn1,mouseBtn2,mouseBtn3 = pygame.mouse.get_pressed()
+                    if(not mouseBtn1):
+                        new_screen_ready=True
+        elif(screen_selected=='main menu'):
+            if(new_screen_ready):
+                check_click()
+                check_hovering()
             else:
                 mouseBtn1,mouseBtn2,mouseBtn3 = pygame.mouse.get_pressed()
                 if(not mouseBtn1):
-                    game_ready=True
-        elif(screen_selected=='main menu'):
-            check_click()
-            check_hovering()
+                    new_screen_ready=True
             window.blit(bg_img,(0,0))
             show_main_menu()
             pygame.display.update()
         elif(screen_selected=='won'):
-            print("won section")
             window.blit(bg_img,(0,0))
             pygame.draw.line(window,(0,0,0),(2*unitLength,unitLength),(2*unitLength,screenHeight-unitLength),line_width)
             pygame.draw.line(window,(0,0,0),(3*unitLength,unitLength),(3*unitLength,screenHeight-unitLength),line_width)
@@ -236,7 +294,20 @@ def main_loop():
             pygame.display.update()
             if(strike_fraction>1):
                 pygame.time.delay(1000)
-                run=False
+                screen_selected='options'
+        elif(screen_selected=='options'):
+            if(new_screen_ready):
+                check_click()
+                check_hovering()  
+            else:
+                mouseBtn1,mouseBtn2,mouseBtn3 = pygame.mouse.get_pressed()
+                if(not mouseBtn1):
+                    new_screen_ready=True
+                pass
+            window.blit(bg_img,(0,0)) 
+            show_options()
+            pygame.display.update()
 
+restart_values()
 set_main_menu()
 main_loop()
