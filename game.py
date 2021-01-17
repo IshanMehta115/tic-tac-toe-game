@@ -16,6 +16,7 @@ bg_img = pygame.image.load(os.path.join(base_path,"bg.png"))
 game_name_font = pygame.font.SysFont("comicsans",100,False,False)
 button_font = pygame.font.SysFont("comicsans",50,False,False)
 marker_font = pygame.font.SysFont('comicsans',30,True,False)
+score_font = pygame.font.SysFont('comicsans',28,True,False)
 
 game_name = "Tic-Tac-Toe"
 game_name_text = ''
@@ -24,6 +25,10 @@ play_game = "Play Game"
 exit_game = "Exit Game"
 restart_game = "Restart Game"
 back_to_main_menu = "Back to Main Menu"
+human_player='X'
+computer_player='Y'
+human_score = 0
+computer_score = 0
 
 buttons = []
 optionButtons = []
@@ -33,8 +38,9 @@ buttonHeight=50
 buttonGap=buttonHeight+30
 
 game_grid = []
-turn = 'player'
+turn = ''
 time=0
+moves = 0
 
 number=0
 dir=''
@@ -44,14 +50,17 @@ strike_fraction = 0
 new_screen_ready=False
 screen_selected='main menu'
 
-
+def reset_game_grid():
+    global game_grid
+    game_grid = [[0,1,2],[3,4,5],[6,7,8]]
 def restart_values():
-    global game_grid,turn,time,number,dir,won,strike_fraction,new_screen_ready
-    game_grid = []
+    global game_grid,turn,time,number,dir,won,strike_fraction,new_screen_ready,moves
+    reset_game_grid()
+    moves=0
     if(random.randint(1,2)==1):
-        turn='player'
+        turn=human_player
     else:
-        turn='computer'
+        turn=computer_player
     number=0
     dir=''
     won=False
@@ -88,14 +97,11 @@ def set_main_menu():
     for i in range(button_number):
         buttons[i].set_rect(pygame.Rect(screenWidth/2-buttonWidth/2,200+i*buttonGap,buttonWidth,buttonHeight))
 
-
     optionButtons.append(button(restart_game,'DarkBlue','White',button_font,'normal'))
     optionButtons.append(button(back_to_main_menu,'DarkBlue','White',button_font,'normal'))
     for i in range(2):
         optionButtons[i].set_rect(pygame.Rect(screenWidth/2-buttonWidth/2,200+i*buttonGap,buttonWidth,buttonHeight))
-         
-
-        
+                 
 def check_hovering():
     mouseX,mouseY = pygame.mouse.get_pos()
     if(screen_selected=='main menu'):
@@ -142,11 +148,8 @@ def check_click():
                     restart_values()
                     screen_selected='main menu'
 
-def check_position(r,c):
-    for i in game_grid:
-        if i[0]==r and i[1]==c:
-            return False
-    return True
+def position_available(r,c):
+    return not (game_grid[r][c]==human_player or game_grid[r][c]==computer_player)
 def strike(a,b):
     global strike_fraction
     if(b=='row'):
@@ -160,61 +163,30 @@ def strike(a,b):
 
     strike_fraction+=0.0625
 
-
 def check_win():
-    for i in range(1,4):
-        this_row_player=0
-        this_row_computer=0
-        for g in game_grid:
-            if(g[0]==i):
-                if g[2]=='X':
-                    this_row_player+=1
-                elif g[2]=='O':
-                    this_row_computer+=1
-        if this_row_player==3 or this_row_computer==3:
-            return i,'col',True
-    
-    for j in range(1,4):
-        this_col_player = 0
-        this_col_computer=0
-        for g in game_grid:
-            if(g[1]==j):
-                if g[2]=='X':
-                    this_col_player+=1
-                elif g[2]=='O':
-                    this_col_computer+=1
-        if this_col_computer==3 or this_col_player==3:
-            return j,'row',True
-    
-    temp_player = 0
-    temp_computer = 0
-    for g in game_grid:
-        if(g[0]==g[1]):
-            if g[2]=='X':
-                temp_player+=1
-            elif g[2]=='O':
-                temp_computer+=1
-    if temp_player==3 or temp_computer==3:
-        return 1,'dia',True
 
-    temp_player = 0
-    temp_computer = 0
-    for g in game_grid:
-        if g[0]+g[1]==4:
-            if g[2]=='X':
-                temp_player+=1
-            elif g[2]=='O':
-                temp_computer+=1
-    if temp_player==3 or temp_computer==3:
-        return 2,'dia',True
-    return 0,'',False
+    for i in range(3):
+        if game_grid[i][0]==game_grid[i][1] and game_grid[i][1]==game_grid[i][2]:
+            return i+1,'row', True, game_grid[i][0]
+
+    for j in range(3):
+        if game_grid[0][j]==game_grid[1][j] and game_grid[1][j]==game_grid[2][j]:
+            return j+1,'col', True, game_grid[0][j]
+    
+    
+    if game_grid[0][0]==game_grid[1][1] and game_grid[1][1]==game_grid[2][2]:
+        return 1,'dia', True, game_grid[0][0]
+
+    if game_grid[2][0]==game_grid[1][1] and game_grid[1][1]==game_grid[0][2]:
+        return 2,'dia',True,game_grid[1][1]    
+    return 0,'',False,''
         
 
 def main_loop():
     run = True
-    global turn,time,screen_selected,number,dir,won,new_screen_ready
+    global turn,time,screen_selected,number,dir,won,new_screen_ready,moves,human_score,computer_score,computer_player,human_player
     while(run):
-        pygame.time.delay(50)
+        pygame.time.delay(100)
         time = max(-1,time-100)
         for events in pygame.event.get():
             if(events.type==pygame.QUIT):
@@ -222,7 +194,7 @@ def main_loop():
         if(screen_selected=='Exit Game'):
             run = False
         elif(screen_selected=='Play Game'):
-            if len(game_grid)==9:
+            if moves==9:
                 pygame.time.delay(1000)
                 restart_values()
                 screen_selected='main menu'
@@ -233,39 +205,55 @@ def main_loop():
                     pygame.draw.line(window,(0,0,0),(3*unitLength,unitLength),(3*unitLength,screenHeight-unitLength),line_width)
                     pygame.draw.line(window,(0,0,0),(unitLength,2*unitLength),(screenWidth-unitLength,2*unitLength),line_width)
                     pygame.draw.line(window,(0,0,0),(unitLength,3*unitLength),(screenWidth-unitLength,3*unitLength),line_width)
+                    human_score_text = score_font.render('You - '+(str)(human_score),True,pygame.Color('DarkBlue'))
+                    window.blit(human_score_text,(screenWidth-human_score_text.get_width()-10,20))
+                    computer_score_text = score_font.render('Computer - '+(str)(computer_score),True,pygame.Color('DarkBlue'))
+                    window.blit(computer_score_text,(10,20))
 
                     mousex,mousey = pygame.mouse.get_pos()
                     mousex = mousex//unitLength
                     mousey = mousey//unitLength
-
+                    mousex-=1
+                    mousey-=1
+                    mousex=(int)(mousex)
+                    mousey=(int)(mousey)
                     mouseBtn1,mouseBtn2,mouseBtn3 = pygame.mouse.get_pressed()
 
-                    if(turn=='player'):
-                        if(1<=mousex<=3 and 1<=mousey<=3):
-                            if(check_position(mousex,mousey)):
+                    if(turn==human_player):
+                        if(0<=mousex<=2 and 0<=mousey<=2):
+                            if(position_available(mousey,mousex)):
                                 if(mouseBtn1):
-                                    game_grid.append((mousex,mousey,'X'))
-                                    turn='computer'
+                                    game_grid[mousey][mousex]=human_player
+                                    moves=moves+1
+                                    turn=computer_player
                                     time = 1000
                                 else:
                                     gap = 10
-                                    pygame.draw.rect(window,(179, 179, 255),(unitLength*mousex+gap,unitLength*mousey+gap,unitLength-2*gap,unitLength-2*gap))
-                    elif(turn=='computer' and len(game_grid)<9 and time<0):
-                        mousex=random.randint(1,3)
-                        mousey=random.randint(1,3)
-                        while(not check_position(mousex,mousey)):
-                            mousex=random.randint(1,3)
-                            mousey=random.randint(1,3)
-                        game_grid.append((mousex,mousey,'O'))
-                        turn='player'
-                    for i in game_grid:
-                        text = game_name_font.render(i[2],True,pygame.Color('DarkBlue'))
-                        window.blit(text,(unitLength*i[0]+unitLength/2-text.get_width()/2,unitLength*i[1]+unitLength/2-text.get_height()/2))
+                                    pygame.draw.rect(window,(179, 179, 255),(unitLength*(mousex+1)+gap,unitLength*(mousey+1)+gap,unitLength-2*gap,unitLength-2*gap))
+                    elif(turn==computer_player and moves<9 and time<0):
+                        mousex=random.randint(0,2)
+                        mousey=random.randint(0,2)
+                        while(not position_available(mousey,mousex)):
+                            mousex=random.randint(0,2)
+                            mousey=random.randint(0,2)
+                        game_grid[mousey][mousex]=computer_player
+                        moves+=1
+                        turn=human_player
+                    
+                    for i in range(3):
+                        for j in range(3):
+                            if game_grid[i][j]==human_player or game_grid[i][j]==computer_player:
+                                text = game_name_font.render(game_grid[i][j],True,pygame.Color('DarkBlue'))
+                                window.blit(text,(unitLength*(j+1)+unitLength/2-text.get_width()/2,unitLength*(i+1)+unitLength/2-text.get_height()/2))
                     pygame.display.update()
-                    number,dir,won = check_win()
+                    number,dir,won,player_type = check_win()
                     if(won):
                         screen_selected='won'
                         pygame.time.delay(500)
+                        if(player_type==human_player):
+                            human_score+=1
+                        else:
+                            computer_score+=1
                 else:
                     mouseBtn1,mouseBtn2,mouseBtn3 = pygame.mouse.get_pressed()
                     if(not mouseBtn1):
@@ -287,9 +275,16 @@ def main_loop():
             pygame.draw.line(window,(0,0,0),(3*unitLength,unitLength),(3*unitLength,screenHeight-unitLength),line_width)
             pygame.draw.line(window,(0,0,0),(unitLength,2*unitLength),(screenWidth-unitLength,2*unitLength),line_width)
             pygame.draw.line(window,(0,0,0),(unitLength,3*unitLength),(screenWidth-unitLength,3*unitLength),line_width)
-            for i in game_grid:
-                    text = game_name_font.render(i[2],True,pygame.Color('DarkBlue'))
-                    window.blit(text,(unitLength*i[0]+unitLength/2-text.get_width()/2,unitLength*i[1]+unitLength/2-text.get_height()/2))
+            human_score_text = score_font.render('You - '+(str)(human_score),True,pygame.Color('DarkBlue'))
+            window.blit(human_score_text,(screenWidth-human_score_text.get_width()-10,20))
+            computer_score_text = score_font.render('Computer - '+(str)(computer_score),True,pygame.Color('DarkBlue'))
+            window.blit(computer_score_text,(10,20))
+           
+            for i in range(3):
+                for j in range(3):
+                    if game_grid[i][j]==human_player or game_grid[i][j]==computer_player:
+                        text = game_name_font.render(game_grid[i][j],True,pygame.Color("DarkBlue"))
+                        window.blit(text,(unitLength*(j+1)+unitLength/2-text.get_width()/2,unitLength*(i+1)+unitLength/2-text.get_height()/2))
             strike(number,dir)
             pygame.display.update()
             if(strike_fraction>1):
