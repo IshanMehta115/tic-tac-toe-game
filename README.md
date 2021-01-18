@@ -12,7 +12,7 @@
 ### <Center>Game Description<br><br>
 This game is also called noughts and crosses. It is a two player turn based game and consists of a 3x3 empty square in which the players can place their marks.<br><br>During their turn each player tries to place three of their marks in a horizontal, vertical, or diagonal row to win.<br><br> This game is so simple that it is often used as a pedagogical tool for teaching the concepts of good sportsmanship and the branch of artificial intelligence that deals with the searching of game trees.
 
-### <center> About the Code<br><br>
+### <center>About the Code<br><br>
 
 #### Useful pygame functions
 
