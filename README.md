@@ -64,7 +64,7 @@ Here is one assumption - that the opponent (that is us) will always make the mos
 Here are some references for learning more about this project.<br>
 For pygame functions and examples
 - [pygame documentaion](https://www.pygame.org/docs/)
-<br>
+
 For learning about Minimax algorithm
 - [wikipedia page for Minimax](https://en.wikipedia.org/wiki/Minimax)
-- [geeks for geeks article on Minimax](https://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-1-introduction)/
+- [geeks for geeks article on Minimax](https://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-1-introduction)
