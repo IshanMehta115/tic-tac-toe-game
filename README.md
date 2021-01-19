@@ -2,6 +2,7 @@
 
 ## Table of Contents
 1. [Game description](#game-description)
+2. [Display pictures](Display pictures)
 3. [About the Code](#about-the-code) 
 	- [Useful pygame functions](#useful-pygame-functions)
 	- [Hovering effect of buttons](#hovering-effect-of-buttons)
@@ -10,8 +11,12 @@
 4. [References](#references)
 
 <br><br><br><br>
-### <Center>Game Description</center><br><br>
+### <center>Game Description</center><br><br>
 This game is also called noughts and crosses. It is a two player turn based game and consists of a 3x3 empty square in which the players can place their marks.<br><br>During their turn each player tries to place three of their marks in a horizontal, vertical, or diagonal row to win.<br><br> This game is so simple that it is often used as a pedagogical tool for teaching the concepts of good sportsmanship and the branch of artificial intelligence that deals with the searching of game trees.<br><br><br><br>
+###<center>Display Pictures</center><br><br>
+![Main menu]( /readme_pics/ss1.png)<br>
+![Game grid](/readme_pics/ss2.png)<br>
+main menu
 
 ### <center>About the Code</center><br><br>
 
@@ -52,8 +57,8 @@ Also we need to place this **check_hovering()** in the main game loop so it is c
 When any player wins , a strike line is drawn where that player has three marks in one line.<br>
 This line has a small animation which gives the feeling that someone is striking the three marks on the winning player.<br>This can be done very easily.<br>All we need to do is get the starting and ending points.<br>Let they be startX,startY and endX,endY<br>Let ```deltaX = endX - startX```and ```deltaY = endY-startY```<br>Now lets also assume a ```fractionValue = 0``` <br>Now lets assume ```movingX = startX + deltaX*fractionValue``` and ```movingY = startY + deltaY*fractionValue``` <br>Now if take the value of fractionValue from 0 to 1 , then the movingX and movingY will go from startX,startY to endX,endY respectively.<br> Now all we need to do is draw a line from startX,startY to movingX,movingY and also keep increasing the fractionValue in the game loop.<br>This will give an effect of a line being drawn from startX,startY to endX,endY.<br><br><br><br>
 #### Minimax Algorithm
-The game has two difficulty levels , easy and hard. In the easy level the computer selects at random a postition from all the available postions and then marks there.<br>But in the hard level this is not the case.The computer this time smartly selects such a postion in the grid which would make the computer win or  end the game in a draw.<br>To do this we use the Minimax algorithm.This is a very simple and intuitive algorithm.It can be easily understood and implemented.<br>The basic idea is this - when the computer has to make a choice as to where to place its mark.Then it first check all the possible positions where it can move.From all these paths it will then select the best possible path.<br>But how to know which path is better?
-Here is one assumption - that the opponent (that is us) will always make the most optimal move in his/her favour. If this is not the case , its even better for the computer.<br><br><br><br>
+The game has two difficulty levels , easy and hard. In the easy level the computer selects at random a postition from all the available postions and then marks there.<br>But in the hard level this is not the case.The computer this time smartly selects such a postion in the grid which would make the computer win or  end the game in a draw.<br>To do this we use the Minimax algorithm.This is a very simple and intuitive algorithm.It can be easily understood and implemented.<br>The basic idea is this - when the computer has to make a choice as to where to place its mark.Then it first recursively checks all the possible positions where it can move.From all these paths it will then select the best possible path.<br>
+Here is one assumption - that the opponent (that is us) will always make the most optimal move in his/her favour. If this is not the case , its even better for the computer.<br>To know more about the Minimax algorithm go see this video - [Playing Games Perfectly With Minimax](https://www.youtube.com/watch?v=EI6vb82I9-o)<br><br><br><br>
 ### <center>References</center><br><br>
 Here are some references for learning more about this project.<br>
 For pygame functions and examples
