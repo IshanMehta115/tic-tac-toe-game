@@ -2,7 +2,7 @@
 
 ## Table of Contents
 1. [Game description](#game-description)
-2. [Display pictures](Display pictures)
+2. [Display pictures](display-pictures)
 3. [About the Code](#about-the-code) 
 	- [Useful pygame functions](#useful-pygame-functions)
 	- [Hovering effect of buttons](#hovering-effect-of-buttons)
@@ -14,7 +14,7 @@
 ### <center>Game Description</center><br><br>
 This game is also called noughts and crosses. It is a two player turn based game and consists of a 3x3 empty square in which the players can place their marks.<br><br>During their turn each player tries to place three of their marks in a horizontal, vertical, or diagonal row to win.<br><br> This game is so simple that it is often used as a pedagogical tool for teaching the concepts of good sportsmanship and the branch of artificial intelligence that deals with the searching of game trees.<br><br><br><br>
 ### <center>Display Pictures</center><br><br>
-![Main menu](readme_pics/ss1.PNG)<br>
+![Main menu](readme_pics/ss1.PNG)
 ![Game grid](readme_pics/ss2.PNG)<br>
 
 ### <center>About the Code</center><br><br>
@@ -41,7 +41,7 @@ here again the color is a 3 length tuple (r,g,b) or predefined pygame.Color('Red
 Also the starting_point and ending_point are also tuples (x,y)<br>
 **It should be noted that the origin of the canvas is at top left and not bottom left. Also x coordinate increases from left to right and the y coordinate increases from top to bottom**<br><br>
 Similar to the line , a rectangle is defined by its color , coordinates of the top-left corner and the dimension of the rectangle . The sides of the rectangle are parallel to the x and y axis.<br><br>
-```pygame.draw.rect(window,color(x_coordinate_top_left_point,y_coordinate_top_left_point,rectangle_width,rectangle_height))```<br><br>
+```pygame.draw.rect(window,color(x_coordinate_top_left_point,y_coordinate_top_left_point,rectangle_width,rectangle_height))```<br><br><br>
 **How to get mouse position and the state of mouse buttons** - pygame offers functions which can return the current position of the mouse pointer and also the states of the mouse buttons.<br>To get the postition of the mouse buttons use - <br>```mouseX,mouseY = pygame.mouse.get_pos()```<br><br>This function will return a tuple of the x and y coordinates of the mouse. This coordinates will be stored in the mouseX and mouseY and can used later.<br>Similaryl to get the state of mouse buttons we can use -<br>```mouse_button_1,mouse_button_2,mouse_button_3 = pygame.mouse.get_pressed()```<br>This functions returns a tuple of boolena values. The value of mouse_button_i is true if the ith mouse button is pressed , false otherwise.<br>
 mouse_button_1 is the left button on our mouse and the mouse_button_2 is the right button on our mouse. And the mouse_button_3 depends on the type of our mouse.<br><br><br><br>
 #### Hovering effect of buttons
