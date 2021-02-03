@@ -2,7 +2,7 @@
 
 ## Table of Contents
 1. [Game description](#game-description)
-2. [Display pictures](display-pictures)
+2. [Display pictures](#display-pictures)
 3. [About the Code](#about-the-code) 
 	- [Useful pygame functions](#useful-pygame-functions)
 	- [Hovering effect of buttons](#hovering-effect-of-buttons)
